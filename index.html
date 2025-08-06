@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Yunus & Tantangan Menuju Niniwe</title>
+  <style>
+    body {
+      font-family: sans-serif;
+      text-align: center;
+      background-color: #e6f7ff;
+    }
+    #gameBoard {
+      display: grid;
+      grid-template-columns: repeat(5, 80px);
+      grid-template-rows: repeat(5, 80px);
+      gap: 5px;
+      justify-content: center;
+      margin: 20px auto;
+    }
+    .cell {
+      width: 80px;
+      height: 80px;
+      background-color: #fff;
+      border: 1px solid #ccc;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 28px;
+    }
+    #controls button {
+      margin: 5px;
+      padding: 10px 20px;
+      font-size: 16px;
+    }
+    #status {
+      margin-top: 20px;
+      font-size: 18px;
+      font-weight: bold;
+    }
+  </style>
+</head>
+<body>
+  <h1>Petualangan Yunus</h1>
+  <p>Bantu Yunus taat dan hindari rintangan menuju Niniwe!</p>
+  <div id="gameBoard"></div>
+
+  <div id="controls">
+    <button onclick="move('up')">⬆️</button>
+    <button onclick="move('left')">⬅️</button>
+    <button onclick="move('right')">➡️</button>
+    <button onclick="move('down')">⬇️</button>
+    <button onclick="pray()">🙏 Doa</button>
+    <button onclick="reset()">🔄 Ulangi</button>
+  </div>
+
+  <div id="status"></div>
+
+  <script>
+    const board = document.getElementById("gameBoard");
+    const statusText = document.getElementById("status");
+
+    let yunus = { x: 0, y: 4 }; // Start pojok kiri bawah
+    const niniwe = { x: 4, y: 0 }; // Tujuan pojok kanan atas
+    let prayed = false;
+    let inFish = false;
+
+    // Titik rintangan (ombak)
+    const waves = [
+      { x: 1, y: 3 },
+      { x: 2, y: 2 },
+      { x: 3, y: 1 }
+    ];
+
+    function isWave(x, y) {
+      return waves.some(w => w.x === x && w.y === y);
+    }
+
+    function drawBoard() {
+      board.innerHTML = "";
+      for (let y = 0; y < 5; y++) {
+        for (let x = 0; x < 5; x++) {
+          const cell = document.createElement("div");
+          cell.classList.add("cell");
+
+          if (x === yunus.x && y === yunus.y) {
+            cell.textContent = inFish ? "🐟🧍" : "🧍";
+          } else if (x === niniwe.x && y === niniwe.y) {
+            cell.textContent = "🏙️";
+          } else if (isWave(x, y)) {
+            cell.textContent = "🌊";
+          } else {
+            cell.textContent = "";
+          }
+
+          board.appendChild(cell);
+        }
+      }
+    }
+
+    function move(direction) {
+      if (yunus.x === niniwe.x && yunus.y === niniwe.y) {
+        statusText.textContent = "🎉 Yunus sudah sampai di Niniwe!";
+        return;
+      }
+
+      if (inFish) {
+        statusText.textContent = "Yunus masih di perut ikan! Berdoa dulu ya!";
+        return;
+      }
+
+      if (!prayed) {
+        statusText.textContent = "Yunus tidak taat! Ia ditelan ikan! 🐟";
+        inFish = true;
+        drawBoard();
+        return;
+      }
+
+      // Gerakan
+      let nextX = yunus.x;
+      let nextY = yunus.y;
+
+      if (direction === "up" && yunus.y > 0) nextY--;
+      if (direction === "down" && yunus.y < 4) nextY++;
+      if (direction === "left" && yunus.x > 0) nextX--;
+      if (direction === "right" && yunus.x < 4) nextX++;
+
+      if (isWave(nextX, nextY)) {
+        statusText.textContent = "Oh tidak! Yunus terkena ombak dan kembali ke awal!";
+        yunus = { x: 0, y: 4 };
+      } else {
+        yunus.x = nextX;
+        yunus.y = nextY;
+        if (yunus.x === niniwe.x && yunus.y === niniwe.y) {
+          statusText.textContent = "🎊 Sampai di Niniwe! Yunus telah taat.";
+        } else {
+          statusText.textContent = "Yunus sedang dalam perjalanan...";
+        }
+      }
+
+      drawBoard();
+    }
+
+    function pray() {
+      if (inFish) {
+        inFish = false;
+        prayed = true;
+        statusText.textContent = "Yunus berdoa 🙏 dan keluar dari perut ikan.";
+      } else if (!prayed) {
+        prayed = true;
+        statusText.textContent = "Yunus sudah berdoa dan siap taat!";
+      } else {
+        statusText.textContent = "Yunus sudah siap! Ayo lanjutkan!";
+      }
+      drawBoard();
+    }
+
+    function reset() {
+      yunus = { x: 0, y: 4 };
+      prayed = false;
+      inFish = false;
+      statusText.textContent = "";
+      drawBoard();
+    }
+
+    drawBoard();
+  </script>
+</body>
+</html>
