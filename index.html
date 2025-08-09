@@ -32,6 +32,7 @@
       margin: 5px;
       padding: 10px 20px;
       font-size: 16px;
+      cursor: pointer;
     }
     #status {
       margin-top: 20px;
@@ -65,7 +66,6 @@
     let prayed = false;
     let inFish = false;
 
-    // Titik rintangan (ombak)
     const waves = [
       { x: 1, y: 3 },
       { x: 2, y: 2 },
@@ -116,7 +116,6 @@
         return;
       }
 
-      // Gerakan
       let nextX = yunus.x;
       let nextY = yunus.y;
 
@@ -162,6 +161,16 @@
       statusText.textContent = "";
       drawBoard();
     }
+
+    // 🎯 Tambahan: Kontrol Keyboard
+    document.addEventListener("keydown", function (event) {
+      if (event.key === "ArrowUp") move("up");
+      if (event.key === "ArrowDown") move("down");
+      if (event.key === "ArrowLeft") move("left");
+      if (event.key === "ArrowRight") move("right");
+      if (event.key === " ") pray(); // Spasi untuk berdoa
+      if (event.key.toLowerCase() === "r") reset(); // 'R' untuk reset
+    });
 
     drawBoard();
   </script>
